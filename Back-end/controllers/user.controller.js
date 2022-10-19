@@ -8,20 +8,26 @@ import User from '../models/user.model.js'
 //to send the data to the user =>Read request on the crud operation
 
 router.get('/',async (req,res)=>{
-    const users=await User.find().lean().exec(); //lean will convert mongoose object to json object!
-    res.send(users)
-
+    const page=req.query.page || 1
+    const size=req.query.size || 8
+    try {
+        const users=await User.find().skip((page-1)*size).limit(size).lean().exec(); 
+        const totalPages=Math.ceil((await User.find().countDocuments())/size);
+        res.status(201).send({data:users,totalPages})
+    } catch (error) {
+        console.log(error);
+    }
 })
 
 //to post any new data to the database .=>Create request on the crud operations
 
+
 router.post('/',async (req,res)=>{
-    try {
-        const postUser=new User(req.body);
-        await postUser.save();
-        res.status(201).send(postUser)     
+    try { 
+        const posts=await User.create(req.body)
+        res.send(posts);
     } catch (error) {
-        res.status(501).send(error);
+        console.log(error)
     }
 })
 

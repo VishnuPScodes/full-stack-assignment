@@ -8,11 +8,11 @@ import mongoose from "mongoose"
 
 const userSchema=new mongoose.Schema({
     name:{type:String,required:true},
-    address:{type:Number,required:false},
+    address:{type:String,required:false},
     phone:{type:Number,required:false},
   
 })
-``
+
 
 const User=mongoose.model("user",userSchema);
 
