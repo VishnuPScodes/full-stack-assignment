@@ -10,8 +10,9 @@ import User from '../models/user.model.js'
 router.get('/',async (req,res)=>{
     const page=req.query.page || 1
     const size=req.query.size || 8
+    const sort=req.query.sort || 1
     try {
-        const users=await User.find().skip((page-1)*size).limit(size).lean().exec(); 
+        const users=await User.find().sort({name:sort}).skip((page-1)*size).limit(size).lean().exec(); 
         const totalPages=Math.ceil((await User.find().countDocuments())/size);
         res.status(201).send({data:users,totalPages})
     } catch (error) {
