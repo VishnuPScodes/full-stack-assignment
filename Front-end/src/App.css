@@ -41,7 +41,9 @@ Model{
   margin: auto;
   width: 500px;
 }
-
+ button:hover{
+  cursor: pointer;
+ }
 
 
 .modal {
