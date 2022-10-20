@@ -25,6 +25,7 @@ import {
 } from '@chakra-ui/react'
 
 function App() {
+  const [edit,setEdit]=useState([])
   const [loading,setLoading]=useState(true)
   const [count, setCount] = useState(0);
   const [deleteis,setDeleteis]=useState(false);
@@ -84,6 +85,19 @@ function App() {
   
   }
 
+//function to store the data for editing
+
+const handleChange1=(e)=>{
+  const {id,value}=e.target;
+  setEdit({...edit,
+  [id]:value
+  })
+}
+//function to edit the data by sending the network request
+const handleEdit=()=>{
+  axios.patch(`https://final-bk.herokuapp.com/users`,edit)
+}
+
   return (
     <div className="App">
         <div className='main'>
@@ -111,8 +125,8 @@ function App() {
               <th>Edit</th>
               <th>Delete</th>
             </tr>
-           {/* model */}
-           
+         
+
             {data.map((e)=>{
               return  <tr key={e._id}>
               <td>{e.name}</td>
@@ -136,16 +150,16 @@ function App() {
            </tr>  
             })}
 
-            {/* model */}
+            {/* model  for editing*/}
 
             <div className='model'> 
            <div id="myModal" class="modal">
            <div class="modal-content">
            <span class="close">close</span>
-           <input placeholder="name" /> <br/>
-           <input placeholder="Address" /> <br/>
-           <input placeholder="Phone" /> <br/>
-           <button>Submit</button>
+           <input placeholder="name" id='name' onChange={handleChange1} /> <br/>
+           <input placeholder="Address" id='address'  onChange={handleChange1}/> <br/>
+           <input placeholder="Phone" id='phone'  onChange={handleChange1}/> <br/>
+           <button onClick={handleEdit}>Submit</button>
            </div>
             </div>
             </div>
