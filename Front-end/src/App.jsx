@@ -25,58 +25,78 @@ import {
 } from '@chakra-ui/react'
 
 function App() {
+  const [loading,setLoading]=useState(true)
   const [count, setCount] = useState(0);
   const [deleteis,setDeleteis]=useState(false);
   const [page,setPage]=useState(1);
   const [data,setData]=useState([]);
   const [sort,setSort]=useState(1);
   const [totalPage,setTotalPage]=useState(1);
+  const [search,setSearch]=useState('');
   const { isOpen, onOpen, onClose } = useDisclosure()
   useEffect(()=>{
-    axios.get(`http://localhost:4000/users?page=${page}&sort=${sort}`).then((res)=>{
+    setLoading(true)
+    axios.get(`https://final-bk.herokuapp.com/users?page=${page}&sort=${sort}&q=${search}`).then((res)=>{
         setData(res.data.data);
         let total=+res.data.totalPages;
         setTotalPage(total)
-       
+        setLoading(false)
     })
-  },[page,sort,deleteis]);
+  },[page,sort,deleteis,search]);
   console.log(data)
+
   //function to handle the sort functionality;
+
   const handleSort=(e)=>{
     let value=e.target.value;
      setSort(value);
   }
-  //function to do the deletion
-  const handleDelete=(e)=>{
-    console.log(e)
-  }
 
+  
   //model
-var modal = document.getElementById("myModal");
-var btn = document.getElementById("myBtn");
-var span = document.getElementsByClassName("close")[0];
-btn.onclick = function() {
-  modal.style.display = "block";
-}
-span.onclick = function() {
-  modal.style.display = "none";
-}
+  setTimeout(()=>{
+    var modal = document.getElementById("myModal");
+    var btn = document.getElementById("myBtn");
+    var span = document.getElementsByClassName("close")[0];
+    btn.onclick = function() {
+      modal.style.display = "block";
+    }
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+    
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  },1000)
 
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+  //function to do seaching 
+
+  const handleSearch=()=>{
+    setLoading(true)
+    axios.post(`https://final-bk.herokuapp.com/users/search?q=${search}`).then((res)=>{
+      setData(res.data)
+    }).then(()=>{
+      setLoading(false)
+    })
+  
   }
-}
- 
+
   return (
     <div className="App">
         <div className='main'>
+
           {/* Search functionality */}
+
           <div className='search'>
-          <Input placeholder='Search name' />
-          <Button>Search</Button>  
-          </div>  
-        
+          <Input placeholder='Search name' onChange={((e)=>{setSearch(e.target.value)})} />
+          <Button onClick={handleSearch} >Search</Button>  
+          </div>
+
+          {/* Loading indicator   */}
+           <div>{loading&&"Loading..."}</div>
 
           <label htmlFor="">Sort by</label>
           <select name="" onChange={handleSort} id="">
@@ -92,29 +112,43 @@ window.onclick = function(event) {
               <th>Delete</th>
             </tr>
            {/* model */}
-           <div className='model'> 
-           <div id="myModal" class="modal">
-                <div class="modal-content">
-                  <span class="close">close</span>
-                  <input placeholder="name" /> <br/>
-                  <button>Submit</button>
-                </div>
-             </div>
-            </div>
+           
             {data.map((e)=>{
               return  <tr key={e._id}>
               <td>{e.name}</td>
               <td>{e.address}</td>
               <td>{e.phone}</td>
-              <td><button onClick={onOpen} id='myBtn'>Edit</button></td>
+              <td><button  id='myBtn' onclick={(()=>{
+                   var modal = document.getElementById("myModal");
+                   
+              })}>Edit</button></td>
+
+              {/* deletion */}
+
               <td><button onClick={(()=>{
-                axios.delete(`http://localhost:4000/users/${e._id}`).then(()=>{
+                setLoading(true)
+                axios.delete(`https://final-bk.herokuapp.com/users/${e._id}`).then(()=>{
                   setDeleteis(!deleteis);
-                  alert('Deleted');
+                 
                 })
+                setLoading(false)
               })}>Delete</button></td>
            </tr>  
             })}
+
+            {/* model */}
+
+            <div className='model'> 
+           <div id="myModal" class="modal">
+           <div class="modal-content">
+           <span class="close">close</span>
+           <input placeholder="name" /> <br/>
+           <input placeholder="Address" /> <br/>
+           <input placeholder="Phone" /> <br/>
+           <button>Submit</button>
+           </div>
+            </div>
+            </div>
            
             </table>
             <div className='btns'>
