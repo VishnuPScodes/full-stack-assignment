@@ -1,9 +1,6 @@
 import express from 'express';
-
 const router=express.Router();
-
 import User from '../models/user.model.js'
-
 
 //to send the data to the user =>Read request on the crud operation
 
@@ -11,7 +8,6 @@ router.get('/',async (req,res)=>{
     const page=req.query.page || 1
     const size=req.query.size || 8
     const sort=req.query.sort || 1
-  
     try {
         const users=await User.find({'$or':[
               {name:{$regex:req.query.q}},
@@ -27,7 +23,6 @@ router.get('/',async (req,res)=>{
 })
 
 //to post any new data to the database .=>Create request on the crud operations
-
 
 router.post('/',async (req,res)=>{
     try { 
@@ -50,7 +45,6 @@ router.delete('/:id',async (req,res)=>{
 })
 
 //update the already present data from the database =>update operation in the crud operations
-
 router.patch('/:id',async (req,res)=>{
     try {
         const newUser=await User.findByIdAndUpdate(req.params.id,req.body,{new:true}).lean().exec();
@@ -60,8 +54,5 @@ router.patch('/:id',async (req,res)=>{
     }
    
 })
-
-
-
 
 export default router;
